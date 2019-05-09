@@ -1,0 +1,81 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>The HTML5 Herald</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+
+</head>
+
+<body>
+    <script>
+    let inputVars = [0,0,0,0,0,
+                0,0,0,0,0,
+                0,0,0,0,0,
+                0,0,0,0,0,
+                0,0,0,0,0];
+    let size = Math.sqrt(inputVars.length);
+    console.log('SIZE', size);
+    let topNode = 100, left = 75, right = 50, bottom = 10;
+    let upNode, downNode, leftNode, rightNode;
+    let globalError = 100;
+    let valueSOR = 1.5;
+
+    let liebmannMethod = (vars) => {
+        let avgError = 0;
+        vars.forEach((current, i) => {
+            current = (
+                ((vars[i - (size)] != undefined)? vars[i - (size)] : topNode) + 
+                ((vars[i - 1] != undefined && i % size != 0)? vars[i - 1] : left) +
+                ((vars[i + (size)] != undefined)? vars[i + (size)] : bottom) + 
+                ((vars[i + 1] != undefined && i % size != size - 1)? vars[i + 1] : right)
+            )/4;
+            current = methodSOR(current, vars[i]);
+            avgError += getRelError(current, vars[i]);
+            vars[i] = current;
+        }); 
+
+        avgError /= vars.length;
+        return vars;
+    };
+
+    let methodSOR = (newVal, oldVal) => {
+        return valueSOR * newVal + (1 - valueSOR) * oldVal;
+    }
+
+    let getRelError = (newVal, oldVal) => {
+        return (newVal - oldVal) / newVal * 100;
+    }
+
+    let updateGlobalError = (val) => {
+        globalError = val;
+    }
+
+    function toMatrix(list, elementsPerSubArray) {
+        var matrix = [], i, k;
+
+        for (i = 0, k = -1; i < list.length; i++) {
+            if (i % elementsPerSubArray === 0) {
+                k++;
+                matrix[k] = [];
+            }
+
+            matrix[k].push(list[i]);
+        }
+        return matrix;
+    }
+
+    for(let m = 0; m < 15; m++){
+        inputVars = liebmannMethod(inputVars);
+    }
+    console.log('>>>VARS', inputVars);
+    console.log('>MATRIX', toMatrix(inputVars, size));
+
+    </script>
+</body>
+</html>
